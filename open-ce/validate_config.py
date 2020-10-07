@@ -12,9 +12,12 @@ disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
 import argparse
 import os
 import sys
-import build_tree
 import utils
 from utils import OpenCEError
+
+utils.check_if_conda_build_exists()
+
+import build_tree # pylint: disable=wrong-import-position
 
 def make_parser():
     ''' Parser input arguments '''
@@ -22,7 +25,7 @@ def make_parser():
                  utils.Argument.REPOSITORY_FOLDER, utils.Argument.PYTHON_VERSIONS,
                  utils.Argument.BUILD_TYPES]
     parser = utils.make_parser(arguments,
-                               description = 'Perform validation on a cond_build_config.yaml file.',
+                               description = 'Perform validation on a conda_build_config.yaml file.',
                                formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     return parser
 
@@ -65,6 +68,7 @@ def validate_config(arg_strings=None):
             packages = [package for recipe in recipes for package in recipe.packages]
             channels = {channel for recipe in recipes for channel in recipe.channels}
             deps = {dep for recipe in recipes for dep in recipe.run_dependencies}
+            deps.update(recipes.get_external_dependencies(variant))
 
             pkg_args = " ".join(["\"{}\"".format(generalize_version(dep)) for dep in deps
                                                                           if not utils.remove_version(dep) in packages])

@@ -28,7 +28,7 @@ class TestBuildTree(build_tree.BuildTree):
                  python_versions,
                  build_types,
                  repository_folder="./",
-                 git_location=build_tree.DEFAULT_GIT_LOCATION,
+                 git_location=utils.DEFAULT_GIT_LOCATION,
                  git_tag_for_env="master",
                  conda_build_config=utils.DEFAULT_CONDA_BUILD_CONFIG):
         self._env_config_files = env_config_files
@@ -75,7 +75,7 @@ def test_clone_repo(mocker):
     '''
     Simple positive test for `_clone_repo`.
     '''
-    git_location = build_tree.DEFAULT_GIT_LOCATION
+    git_location = utils.DEFAULT_GIT_LOCATION
 
     mock_build_tree = TestBuildTree([], "3.6", "cpu")
 
@@ -89,13 +89,13 @@ def test_clone_repo(mocker):
                                                                "/test/my_repo"]))
     )
 
-    assert mock_build_tree._clone_repo("/test/my_repo", None, "master") == 0
+    assert mock_build_tree._clone_repo(git_location + "/my_repo.git", "/test/my_repo", None, "master") == 0
 
 def test_clone_repo_failure(mocker, capsys):
     '''
     Simple negative test for `_clone_repo`.
     '''
-    git_location = build_tree.DEFAULT_GIT_LOCATION
+    git_location = utils.DEFAULT_GIT_LOCATION
 
     mock_build_tree = TestBuildTree([], "3.6", "cpu")
 
@@ -104,7 +104,7 @@ def test_clone_repo_failure(mocker, capsys):
         side_effect=(lambda x: helpers.validate_cli(x, expect=["git clone"], retval=1))
     )
 
-    assert mock_build_tree._clone_repo("/test/my_repo", None, "master") == 1
+    assert mock_build_tree._clone_repo("https://bad_url", "/test/my_repo", None, "master") == 1
     captured = capsys.readouterr()
     assert "Unable to clone repository" in captured.out
 
@@ -136,7 +136,15 @@ def test_get_dependency_names(mocker):
     for build_command in mock_build_tree:
         output += ' '.join([mock_build_tree[dep].name() for dep in build_command.build_command_dependencies]) + "\n"
 
-    expected_output = "\nrecipe2-py2.6-cpu\nrecipe2-py2.6-cpu recipe3\n"
+    expected_output = "\nrecipe2-py26-cpu\nrecipe2-py26-cpu recipe3\n"
 
     assert output == expected_output
 
+def test_build_tree_len(mocker):
+    '''
+    Tests that the __len__ function works for BuildTree
+    '''
+    mock_build_tree = TestBuildTree([], "3.6", "cpu")
+    mock_build_tree.build_commands = sample_build_commands
+
+    assert len(mock_build_tree) == 3
