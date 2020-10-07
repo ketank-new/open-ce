@@ -34,5 +34,5 @@ spec:
         arguments:
           parameters:
           - name: build-pkg
-            value: "--working_directory {{ recipe.repository  }}  --python_version {{ recipe.python }} --build_types {  {recipe.build_type}}  --channels  {{recipe.channels}} --recipes {{ recipe.recipe }}"
+            value: "--working_directory {{ recipe.repository  }}  --python_version {{ recipe.python }} --build_types {{recipe.build_type}}  --channels  {{recipe.channels}} --recipes {{ recipe.recipe }}"
       {% endfor %}
