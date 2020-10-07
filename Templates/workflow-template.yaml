@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: open-ce-build-
+spec:
+  entrypoint: build-pkg-framework
+  volumeClaimTemplates:
+  - metadata:
+      name: workdir
+    spec:
+      storageClassName: nfs-storageclass
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+  volumes:
+  - name: varlibcontainers
+  - name: tensorrt-7-0
+    persistentVolumeClaim:
+      claimName: tensorrt-7-0
+  - name: oc-registry-cred
+    secret:
+      secretName: oc-registry-cred
+  templates:
+  - name: build-pkg-framework
+    dag:
+      tasks:
+      {% for recipe in buildTree %}
+      - name: {{ recipe.name() }}
+        dependencies: {{ dependency_map.get(recipe.recipe)  }}
+        templateRef:
+          name: build-pkg-template
+          template: build-package
+        arguments:
+          parameters:
+          - name: build-pkg
+            value: "--working_directory {{ recipe.repository  }}  --python_version {{ recipe.python }} --build_types {  {recipe.build_type}}  --channels  {{recipe.channels}} --recipes {{ recipe.recipe }}"
+      {% endfor %}
