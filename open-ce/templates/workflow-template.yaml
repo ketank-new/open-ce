@@ -27,12 +27,15 @@ spec:
       tasks:
       {% for recipe in buildTree %}
       - name: {{ recipe.name() }}
-        dependencies: {{ dependency_map.get(recipe.recipe)  }}
+        dependencies: [{% for dep in recipe.build_command_dependencies -%}
+        '{{ buildTree[dep].name() }}'
+        {%- if not loop.last %}, {% endif %}
+        {%- endfor %}]
         templateRef:
           name: build-pkg-template
           template: build-package
         arguments:
           parameters:
           - name: build-pkg
-            value: "--working_directory {{ recipe.repository  }}  --python_version {{ recipe.python }} --build_types {{recipe.build_type}}  --channels  {{recipe.channels}} --recipes {{ recipe.recipe }}"
+            value: "{{ recipe.feedstock_args()|join(' ') }}"
       {% endfor %}

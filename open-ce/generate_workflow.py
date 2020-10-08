@@ -4,7 +4,6 @@ import sys
 
 def main():
 
-    dependency_map = {}
     env_file_list = []
     python_variants = {'3.6', '3.7'}
     build_types = {'cuda', 'cpu'}
@@ -36,28 +35,16 @@ def main():
     if not buildTree:
           sys.exit(1)
 
-    # Itrerate over the object to prepare a 
-    # dictionary of recipe as key and recipe dependency list as its value
-    for buildCmd in buildTree:
-        dependency_list = []
-        if len(buildCmd.build_command_dependencies):
-            for dependency in buildCmd.build_command_dependencies:
-              dependency_list.append(str(buildTree[dependency].name()))
-        else:
-            dependency_map.update({buildCmd.recipe: []})
-        dependency_map.update({buildCmd.recipe: dependency_list})
-
-
     # Load the workflow-template 
     file_loader = FileSystemLoader('open-ce/templates')
     env = Environment(loader=file_loader)
     template = env.get_template('workflow-template.yaml')
-    print(template.render(buildTree=buildTree,dependency_map=dependency_map))
+    print(template.render(buildTree=buildTree))
 
     # Write the generated workflow to a file
     filename = 'workflows/workflow.yaml'
     with open(filename, 'w') as fh:
-        fh.write(template.render(buildTree=buildTree,dependency_map=dependency_map))
+        fh.write(template.render(buildTree=buildTree))
 
 if __name__ == "__main__":
       main()
