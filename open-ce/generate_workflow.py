@@ -1,6 +1,7 @@
 from build_tree import BuildTree
 from jinja2 import Template,Environment, FileSystemLoader
 import sys
+import os
 
 def main():
 
@@ -42,6 +43,8 @@ def main():
     print(template.render(buildTree=buildTree))
 
     # Write the generated workflow to a file
+    if not os.path.exists('workflows'):
+        os.mkdir('workflows')
     filename = 'workflows/workflow.yaml'
     with open(filename, 'w') as fh:
         fh.write(template.render(buildTree=buildTree))
