@@ -69,7 +69,8 @@ class BuildCommand():
         """
         Returns a name representing the Build Command
         """
-        result = self.recipe
+        self.recipe = self.recipe.replace(".","-")
+        result = self.recipe.replace("_","-")
         if self.python:
             result +=  "-py" + self.python.replace(".","")
         if self.build_type:
