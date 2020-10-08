@@ -37,5 +37,5 @@ spec:
         arguments:
           parameters:
           - name: build-pkg
-            value: "{{ recipe.feedstock_args()|join(' ') }}"
+            value: "{{ recipe.feedstock_args()|join(' ') --output_folder /source/output}}"
       {% endfor %}
