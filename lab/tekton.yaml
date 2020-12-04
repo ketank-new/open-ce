@@ -27,4 +27,4 @@ spec:
       name: pipelinerun-$(uid)
     spec:
       pipelineRef:
-        name: pipeline
+        name: hello-goodbye
