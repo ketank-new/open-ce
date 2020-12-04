@@ -1,0 +1,61 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pipeline
+spec:
+  tasks:
+  - name: xx1
+    taskRef:
+      name: the-task
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: the-task
+spec:
+  steps:
+  - args:
+    - 01 version
+    command:
+    - echo
+    image: ubuntu
+    name: echo
+  - args:
+    - -l
+    - /
+    command:
+    - ls
+    image: ubuntu
+    name: lslslash
+  - args:
+    - -l
+    command:
+    - ls
+    image: ubuntu
+    name: lsl-ubuntu
+  - command:
+    - pwd
+    image: ubuntu
+    name: pwd
+  - command:
+    - ls
+    image: ubuntu
+    name: ls
+  - command:
+    - env
+    image: ubuntu
+    name: env
+  - args:
+    - -c
+    - echo stuff > file; ls; cat file
+    command:
+    - /bin/bash
+    image: ubuntu
+    name: write
+  - args:
+    - -l
+    command:
+    - ls
+    image: ubuntu
+    name: lsafterfilemissing
