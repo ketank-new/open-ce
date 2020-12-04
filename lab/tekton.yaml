@@ -28,3 +28,58 @@ spec:
     spec:
       pipelineRef:
         name: hello-goodbye
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: hello-goodbye
+spec:
+  tasks:
+  - name: hello
+    taskRef:
+      name: hello
+  - name: afternoon
+    runAfter: [hello]
+    taskRef: 
+      name: afternoon
+  - name: goodbye
+    runAfter: [hello, afternoon]
+    taskRef:
+      name: goodbye
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: goodbye
+spec:
+  steps:
+    - name: goodbye
+      image: ubuntu
+      script: |
+        #!/bin/bash
+        echo "Goodbye World!"
+ ---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: afternoon
+spec:
+  steps:
+    - name: mid-day
+      image: ubuntu
+      script: |
+        #!/bin/bash
+        echo "Good Afternoon!"
+ ---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: hello
+spec:
+  steps:
+    - name: hello
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "Hello World!"
