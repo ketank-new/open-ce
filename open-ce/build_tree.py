@@ -298,7 +298,6 @@ class BuildTree(): #pylint: disable=too-many-instance-attributes
         # of variants.
         self._possible_variants = utils.make_variants(python_versions, build_types, mpi_types, cuda_versions)
         self.build_commands = []
-        self._cuda_versions = cuda_versions
         for variant in self._possible_variants:
             try:
                 build_commands, external_deps, test_feedstocks = self._create_all_commands(variant)
@@ -320,9 +319,6 @@ class BuildTree(): #pylint: disable=too-many-instance-attributes
             self.build_commands += build_commands
 
         self._detect_cycle()
-        
-    def get_cuda_versions(self):
-        return self._cuda_versions
 
     def _get_repo(self, env_config_data, package):
         # If the feedstock value starts with any of the SUPPORTED_GIT_PROTOCOLS, treat it as a url. Otherwise
